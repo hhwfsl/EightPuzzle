@@ -6,7 +6,24 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <Authors>Miaki</Authors>
+    <Company>Miaki</Company>
+    <ApplicationIcon>Resource\AppIcon.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="AppIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resource\AppIcon.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="AppIcon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Data\" />

@@ -1,110 +1,6 @@
-﻿using System.ComponentModel;
-
+﻿
 namespace EightPuzzle
 {
-    /// <summary>
-    /// Node类型，对应单个格子的类型，用于操作每个格子
-    /// </summary>
-    public class Node:INotifyPropertyChanged
-    {
-        int _value = 0;//格子对应的值
-        string _displayValue = string.Empty;//格子对应显示的string值，0为空格
-        int _x = 0;//格子在二维数组中的x坐标
-        int _y = 0;//格子在二维数组中的y坐标
-        int _index = 0;//格子在UniformGrid中的下标
-        public int Value
-        {
-            get { return _value; }
-            set
-            {
-                _value = value;
-                DisplayValue = _value==0?" ":_value.ToString();
-                OnPropertyChanged(nameof(Value));
-                OnPropertyChanged(nameof(DisplayValue));
-            }
-        }
-        public string DisplayValue
-        {
-            get { return _displayValue; }
-            set
-            {
-                _displayValue = value;
-                OnPropertyChanged(nameof(DisplayValue));
-            }
-        }
-        public int X
-        {
-            get { return _x; }
-            set
-            {
-                _x = value;
-                OnPropertyChanged(nameof(X));
-            }
-        }
-        public int Y
-        {
-            get { return _y; }
-            set
-            {
-                _y = value;
-                OnPropertyChanged(nameof(Y));
-            }
-        }
-
-        public int Index
-        {
-            get { return _index; }
-            set
-            {
-                _index = value;
-                OnPropertyChanged(nameof(Index));
-            }
-        }
-        /// <summary>
-        /// 深拷贝构造函数
-        /// </summary>
-        /// <param name="o">拷贝对象</param>
-        public Node(Node o)
-        {
-            _value = o.Value;
-            X = o.X;
-            Y = o.Y;
-            _displayValue = o.DisplayValue;
-            _index = o.Index;
-        }
-        /// <summary>
-        /// 无参构造函数
-        /// </summary>
-        public Node()
-        {
-            //空
-        }
-        /// <summary>
-        /// 设置下标，坐标
-        /// </summary>
-        /// <param name="index">下标</param>
-        public void SetValue(int index)
-        {
-            Index = index;
-            X = index/Constants.GridRange;
-            Y = index%Constants.GridRange;
-        }
-        /// <summary>
-        /// 数据绑定PropertyChanged事件
-        /// </summary>
-        public event PropertyChangedEventHandler? PropertyChanged;
-        /// <summary>
-        /// 数据绑定OnPropertyChanged，数据改变时调用
-        /// </summary>
-        /// <param name="propertyName">变量名</param>
-        protected virtual void OnPropertyChanged(string propertyName)
-        {
-            if(PropertyChanged != null)
-            {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
     /// <summary>
     /// NineGrid九宫格类，用于管理九宫格
     /// </summary>
@@ -112,7 +8,25 @@ namespace EightPuzzle
     {
         public Node[,] map = new Node[Constants.GridRange,Constants.GridRange];//九宫格二维数组
         public int inverseNumber = 0;//逆序数
+        int _blankX = 0;
+        int _blankY = 0;
         
+        public int BlankX
+        {
+            get { return _blankX; }
+            set
+            {
+                _blankX = value;
+            }
+        }
+        public int BlankY
+        {
+            get { return _blankY; }
+            set
+            {
+                _blankY = value;
+            }
+        }
         /// <summary>
         /// 无参构造函数，初始化九宫格
         /// </summary>
@@ -126,6 +40,18 @@ namespace EightPuzzle
                 }
             }
         }
+        public NineGrid(NineGrid copyMap)
+        {
+            for (int i = 0; i < Constants.GridRange; i++)
+            {
+                for (int j = 0; j < Constants.GridRange; j++)
+                {
+                    map[i, j] = new Node(copyMap.map[i, j]);
+                }
+            }
+            BlankX = copyMap.BlankX;
+            BlankY = copyMap.BlankY;
+        }
         /// <summary>
         /// 计算逆序数
         /// </summary>
@@ -138,7 +64,7 @@ namespace EightPuzzle
                 int temp = list[i];
                 for(int j = i+1;j<list.Count;j++)
                 {
-                    if(temp > list[j])
+                    if(temp!=0 && list[j]!=0 && temp > list[j])
                     {
                         count++;
                     }
@@ -188,6 +114,38 @@ namespace EightPuzzle
                     map[i,j] = new Node(list[k++]);
                 }
             }
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is NineGrid other)
+            {
+                for (int i = 0; i < Constants.GridRange; i++)
+                {
+                    for (int j = 0; j < Constants.GridRange; j++)
+                    {
+                        if (map[i, j].Value != other.map[i, j].Value)
+                        {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            int hash = 17;
+            for (int i = 0; i < Constants.GridRange; i++)
+            {
+                for (int j = 0; j < Constants.GridRange; j++)
+                {
+                    hash = hash * 3 + map[i, j].Value.GetHashCode();
+                }
+            }
+            return hash;
         }
     }
 }
